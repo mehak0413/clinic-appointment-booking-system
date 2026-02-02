@@ -1,0 +1,195 @@
+To Register a Doctor
+POST http://localhost:8081/api/auth/register/doctor
+{
+    "name": "Dr. Ramya Padala",
+    "email": "dr.ramya@gmail.com",
+    "specialization": "Neurology",
+    "password": "Ramya@1"
+}
+------------------------------------------------------------------
+To Register a Patient
+POST http://localhost:8081/api/auth/register/patient
+{
+    "name": "Mehak",
+    "email": "mehak@gmail.com",
+    "password": "Mehak@1"
+}
+------------------------------------------------------------------
+To Login an Admin
+POST http://localhost:8081/api/auth/login
+{
+    "email": "admin@example.com",
+    "password": "adminpass"
+}
+Response:
+{
+    "token": "jwt_token_here",
+    "role": "ADMIN"
+}
+------------------------------------------------------------------
+To Register an Admin
+POST http://localhost:8081/api/auth/register/admin
+Headers: Authorization: Bearer <admin_jwt_token>
+{
+    "name": "Super Admin",
+    "email": "admin@example.com",
+    "specialization": "Management",
+    "password": "adminpassword"
+}
+------------------------------------------------------------------
+To Create an Appointment (Role: Patient)
+POST http://localhost:8081/appointments
+Headers: Authorization: Bearer <patient_jwt_token>
+{
+    "doctorId": 1,
+    "appointmentTime": "2025-09-15T10:00:00",
+    "status": "PENDING"
+}
+------------------------------------------------------------------
+To Update an Appointment (Role:Patient)
+PUT http://localhost:8081/appointments/id  (id is appointment id which is to be updated)
+Headers: Authorization: Bearer <patient_jwt_token>
+{ "doctorId": 2,
+   "appointmentTime": "2025-09-17T11:00:00",
+   "status": "PENDING"
+}
+------------------------------------------------------------------
+To View a Specific appointment of a Patient (Role: Patient)
+Headers: Authorization: Bearer <patient_jwt_token>
+GET http://localhost:8081/appointments/id  (id is appointment id which is to be viewed)
+None
+------------------------------------------------------------------
+To Delete a Specific appointment of a Patient (Role: Patient)
+Headers: Authorization: Bearer <patient_jwt_token>
+DELETE http://localhost:8081/appointments/id  (id is appointment id which is to be deleted)
+None
+------------------------------------------------------------------
+To View Prescription by Appointment Id (Role: Patient)
+Headers: Authorization: Bearer <patient_jwt_token>
+GET http://localhost:8081/prescriptions/id (id is prescription id which is to be deleted)
+NONE
+------------------------------------------------------------------
+To View Prescription by Appointment Id (Role: Patient)
+Headers: Authorization: Bearer <patient_jwt_token>
+GET http://localhost:8081/prescriptions/appointment/id (id is appointment id which is to be deleted)
+NONE
+------------------------------------------------------------------
+To Create a Prescription(Role: Doctor)
+POST http://localhost:8081/prescriptions
+Headers: Authorization: Bearer <doctor_jwt_token>
+{ "appointmentId": 1,
+  "medication": "Paracetamol",
+  "dosage": "500mg",
+  "instructions": "2 times a day"
+}
+------------------------------------------------------------------
+To view a Prescription written by that Doctor(Role:Doctor or Patient)
+Headers: Authorization: Bearer <doctor_jwt_token> or <patient_jwt_token>
+GET http://localhost:8081/prescriptions/id (id is prescription id which is to be viewed)
+None
+------------------------------------------------------------------
+To view all  Prescriptions related to an appointmentId written by that Doctor(Role:Doctor or Patient)
+Headers: Authorization: Bearer <doctor_jwt_token> or <patient_jwt_token>
+GET http://localhost:8081/prescriptions/appointment/id (id is prescriptions of appointment id which is to be viewed)
+None
+------------------------------------------------------------------
+To delete a Prescription written by that Doctor(Role:Doctor)
+Headers: Authorization: Bearer <doctor_jwt_token>
+DELETE http://localhost:8081/prescriptions/id (id is prescription id which is to be deleted)
+None
+------------------------------------------------------------------
+To get History from Microservice(Role: Patient or Doctor)
+Headers: Authorization: Bearer <doctor_jwt_token>
+GET http://localhost:8080/history
+None
+------------------------------------------------------------------
+To store prescription history directly from Microservice and in its db only(Role: Patient or Doctor)
+Headers: Authorization: Bearer <doctor_jwt_token> or <patient_jwt_token>
+POST http://localhost:8080/history
+{
+    "appointmentId": 1,
+    "doctorId": 10,
+    "patientId": 20,
+    "medication": "Paracetamol",
+    "dosage": "500mg",
+    "instructions": "Take twice a day"
+}
+None
+------------------------------------------------------------------
+To get a patient's history of prescriptions by patient id(Role: patient)
+Headers: Authorization: Bearer <patient_jwt_token>
+GET http://localhost:8080/history/patient/patientid
+None
+------------------------------------------------------------------
+To get history of prescriptions written by a doctor(Role:Doctor)
+Headers: Authorization: Bearer <doctor_jwt_token>
+GET http://localhost:8080/history/doctorid
+None
+------------------------------------------------------------------
+To get all prescriptions of an appointment(Role:Patient)
+Headers: Authorization: Bearer <patient_jwt_token>
+GET http://localhost:8080/history/appointment/appointmentid
+None
+------------------------------------------------------------------
+To see all the doctors(Role:Admin)
+Headers: Authorization: Bearer <admin_jwt_token>
+GET http://localhost:8081/admin/doctors
+None
+------------------------------------------------------------------
+To add a doctor(Role:Admin)
+Headers: Authorization: Bearer <admin_jwt_token>
+POST http://localhost:8081/admin/doctors
+{
+    "name":"Dr. Michael Dhiman",
+    "email": "michael@gmail.com",
+    "password": "Michael@2",
+    "specialization":"Cardiology",
+    "role":"Doctor"
+}
+------------------------------------------------------------------
+To update fields(Role: Admin)
+PUT http://localhost:8081/admin/doctors/id (id of doctor to be updated)
+Headers: Authorization: Bearer <admin_jwt_token>
+{
+    "name":"Dr. Michael Dhiman",
+    "email": "michael@gmail.com",
+    "password": "Michael@2",
+    "specialization":"Cardiology",
+    "role":"Doctor"
+}
+------------------------------------------------------------------
+To delete a doctor by id onlly if they have no appointments(Role:Admin)
+Headers: Authorization: Bearer <admin_jwt_token>
+DELETE http://localhost:8081/admin/doctors/id
+None
+------------------------------------------------------------------
+To see all the patientd(Role:Admin)
+Headers: Authorization: Bearer <admin_jwt_token>
+GET http://localhost:8081/admin/patients
+None
+------------------------------------------------------------------
+To add a patient(Role:Admin)
+Headers: Authorization: Bearer <admin_jwt_token>
+POST http://localhost:8081/admin/patients
+{
+    "name":"Maridul Walia",
+    "email": "maridul@gmail.com",
+    "password": "Maridul@2",
+    "role":"PATIENT"
+}
+------------------------------------------------------------------
+To update fields(Role: Admin)
+PUT http://localhost:8081/admin/patients/id (id of patient to be updated)
+Headers: Authorization: Bearer <admin_jwt_token>
+{
+    "name":"Maridul Walia",
+    "email": "maridulwalia@gmail.com",
+    "password": "Maridul@2",
+    "role":"PATIENT"
+}
+------------------------------------------------------------------
+To delete a patient by id only if they have no appointments(Role:Admin)
+Headers: Authorization: Bearer <admin_jwt_token>
+DELETE http://localhost:8081/admin/patients/id
+None
+------------------------------------------------------------------
