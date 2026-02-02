@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Appointment Confirmed</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-6 bg-gray-100">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md text-center">
+        <h1 class="text-2xl font-bold text-green-600 mb-4">Appointment Confirmed!</h1>
+
+        <p class="mb-2">Your appointment has been successfully booked.</p>
+
+        <div class="border rounded-lg p-4 bg-gray-50 mb-4">
+            <p><strong>Appointment ID:</strong> <span th:text="${appointment.id}"></span></p>
+            <p><strong>Doctor:</strong> <span th:text="${appointment.doctor.name}"></span></p>
+            <p><strong>Patient:</strong> <span th:text="${appointment.patient.name}"></span></p>
+            <p><strong>Time:</strong> <span th:text="${appointment.appointmentTime}"></span></p>
+            <p><strong>Status:</strong> <span th:text="${appointment.status}"></span></p>
+        </div>
+
+        <div class="space-x-4">
+            <a href="/appointments" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View All Appointments</a>
+            <a href="/appointments/book" class="bg-green-500 text-white px-4 py-2 rounded-lg">Book Another</a>
+        </div>
+    </div>
+</body>
+</html>

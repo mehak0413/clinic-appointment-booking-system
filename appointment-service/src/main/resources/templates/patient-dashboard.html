@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragments/head :: commonHead('Patient Dashboard')}"
+  ></head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Header at the top, full width -->
+    <header class="bg-white shadow-md w-full z-10 relative">
+      <div
+        th:replace="~{fragments/header :: header('Patient Dashboard')}"
+      ></div>
+    </header>
+
+    <!-- Container for sidebar and main content -->
+    <div class="flex min-h-screen">
+      <!-- Sidebar with fixed positioning -->
+      <aside
+        class="w-64 bg-white shadow-lg fixed left-0 top-0 h-full pt-20 z-0"
+      >
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+      </aside>
+
+      <!-- Main content with proper margin -->
+      <main class="flex-1 ml-64 p-8">
+        <!-- Page header -->
+        <h1 class="text-3xl font-bold mb-6 text-gray-700">Patient Dashboard</h1>
+
+        <!-- Stats cards using fragment -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div
+            th:replace="~{fragments/cards :: card('Upcoming Appointments', ${upcomingAppointments.size()})}"
+          ></div>
+          <div
+            th:replace="~{fragments/cards :: card('Past Appointments', ${pastAppointments.size()})}"
+          ></div>
+          <div
+            th:replace="~{fragments/cards :: card('Total Doctors', ${totalDoctors})}"
+          ></div>
+        </div>
+
+        <!-- Appointments table -->
+        <div class="bg-white shadow rounded-xl p-6 mb-8">
+          <h2 class="text-xl font-semibold mb-4">All Appointments</h2>
+          <table class="w-full table-auto border-collapse">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="px-4 py-2 text-left">Doctor</th>
+                <th class="px-4 py-2 text-left">Date & Time</th>
+                <th class="px-4 py-2 text-left">Status</th>
+                <th class="px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="appt : ${appointments}" class="border-b">
+                <td class="px-4 py-2" th:text="${appt.doctorName}">Dr. Name</td>
+                <td
+                  class="px-4 py-2"
+                  th:text="${#temporals.format(appt.appointmentTime, 'dd MMM yyyy HH:mm')}"
+                >
+                  Date
+                </td>
+                <td class="px-4 py-2" th:text="${appt.status}">Status</td>
+                <td class="px-4 py-2 flex space-x-2">
+                  <button
+                    type="button"
+                    class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition"
+                    th:onclick="'showUpdateAppointmentModal(' + ${appt.id} + ')'"
+                  >
+                    Update
+                  </button>
+                  <form
+                    th:action="@{/patient/appointments/{id}/cancel(id=${appt.id})}"
+                    method="post"
+                  >
+                    <button
+                      type="submit"
+                      class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition"
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${appointments.size()} == 0">
+                <td colspan="4" class="text-center py-4 text-gray-500">
+                  No appointments found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Weekly appointments chart -->
+        <div class="bg-white shadow rounded-xl p-6">
+          <h2 class="text-xl font-semibold mb-4">Weekly Appointments</h2>
+          <canvas id="weeklyChart"></canvas>
+        </div>
+        <!-- Update Appointment Modal -->
+        <div
+          id="updateAppointmentModal"
+          class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div class="bg-white rounded-xl p-6 w-96 shadow-lg relative">
+            <h2
+              id="updateAppointmentModalTitle"
+              class="text-xl font-semibold mb-4"
+            >
+              Update Appointment
+            </h2>
+            <form id="updateAppointmentForm">
+              <input type="hidden" id="updateAppointmentId" />
+
+              <!-- Appointment Time -->
+              <label class="block font-semibold mb-1">New Date & Time:</label>
+              <input
+                type="datetime-local"
+                id="updateAppointmentTime"
+                class="w-full border px-3 py-2 rounded-lg mb-4"
+              />
+
+              <!-- Status -->
+              <label class="block font-semibold mb-1">Status:</label>
+              <select
+                id="updateAppointmentStatus"
+                class="w-full border px-3 py-2 rounded-lg mb-4"
+              >
+                <option value="">-- No change --</option>
+                <option value="PENDING">PENDING</option>
+                <option value="CONFIRMED">CONFIRMED</option>
+                <option value="CANCELLED">CANCELLED</option>
+                <option value="RESCHEDULED">RESCHEDULED</option>
+                <option value="COMPLETED">COMPLETED</option>
+              </select>
+
+              <!-- Doctor -->
+              <label class="block font-semibold mb-1">Doctor:</label>
+              <select
+                id="updateAppointmentDoctor"
+                class="w-full border px-3 py-2 rounded-lg mb-4"
+              >
+                <option value="">-- No change --</option>
+                <option
+                  th:each="doc : ${allDoctors}"
+                  th:value="${doc.id}"
+                  th:text="${doc.name}"
+                ></option>
+              </select>
+
+              <div class="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onclick="closeUpdateAppointmentModal()"
+                  class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+                  /*<![CDATA[*/
+                  const labels = [[${chartLabels}]];
+                  const data = {
+                      labels: labels,
+                      datasets: [{
+                          label: 'Appointments',
+                          backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                          borderColor: 'rgba(59, 130, 246, 1)',
+                          borderWidth: 1,
+                          data: [[${chartData}]],
+                      }]
+                  };
+
+                  const config = {
+                      type: 'bar',
+                      data: data,
+                      options: {
+                          responsive: true,
+                          plugins: {
+                              legend: {
+                                  display: false
+                              }
+                          },
+                          scales: {
+                              y: {
+                                  beginAtZero: true,
+                                  precision: 0
+                              }
+                          }
+                      }
+                  };
+
+                  new Chart(
+                      document.getElementById('weeklyChart'),
+                      config
+                  );
+                  /*]]>*/
+
+                  function showUpdateAppointmentModal(id) {
+              const modal = document.getElementById("updateAppointmentModal");
+              modal.classList.remove("hidden");
+
+              fetch(`/api/appointments/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                  document.getElementById("updateAppointmentId").value = id;
+                  document.getElementById("updateAppointmentStatus").value = data.status;
+                  document.getElementById("updateAppointmentDoctor").value = String(data.doctorId);
+                  const datetime = new Date(data.appointmentTime);
+                  const isoStr = datetime.toISOString().substring(0,16); // yyyy-MM-ddTHH:mm
+                  document.getElementById("updateAppointmentTime").value = isoStr;
+                });
+            }
+
+            function closeUpdateAppointmentModal() {
+              document.getElementById("updateAppointmentModal").classList.add("hidden");
+            }
+
+
+            document.getElementById("updateAppointmentForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const id = document.getElementById("updateAppointmentId").value;
+        const appointmentTime = document.getElementById("updateAppointmentTime").value;
+        const status = document.getElementById("updateAppointmentStatus").value;
+        const doctorId = document.getElementById("updateAppointmentDoctor").value;
+
+        // Build JSON dynamically with only non-empty fields
+        const body = {};
+        if (appointmentTime) body.appointmentTime = appointmentTime;
+        if (status) body.status = status;
+        if (doctorId) body.doctorId = doctorId;
+
+        fetch(`/api/appointments/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        })
+        .then(res => {
+          if (res.ok) {
+            closeUpdateAppointmentModal();
+            location.reload();
+          } else {
+            alert("Failed to update appointment.");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

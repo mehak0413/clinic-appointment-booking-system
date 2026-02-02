@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{fragments/head :: commonHead('My Prescriptions')}"></head>
+<body>
+    <div th:insert="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="ml-64 p-6">
+        <h1 class="text-2xl font-bold mb-6">My Prescription History</h1>
+
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">Medication</th>
+                    <th class="px-4 py-2">Dosage</th>
+                    <th class="px-4 py-2">Instructions</th>
+                    <th class="px-4 py-2">Issued At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="pres : ${prescriptions}">
+                    <td class="px-4 py-2" th:text="${pres.medication}"></td>
+                    <td class="px-4 py-2" th:text="${pres.dosage}"></td>
+                    <td class="px-4 py-2" th:text="${pres.instructions}"></td>
+                    <td class="px-4 py-2" th:text="${#temporals.format(T(java.time.LocalDateTime).parse(pres.issuedAt), 'dd MMM yyyy HH:mm')}"></td>
+                </tr>
+                <tr th:if="${prescriptions.size()} == 0">
+                    <td colspan="4" class="text-center py-4 text-gray-500">No prescriptions found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

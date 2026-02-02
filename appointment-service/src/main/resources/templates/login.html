@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/head :: commonHead('Login Page')}"></head>
+  <body
+    class="bg-gradient-to-r from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center"
+  >
+    <div class="bg-white p-10 rounded-2xl shadow-2xl w-96">
+      <h1 class="text-3xl font-bold mb-6 text-center text-blue-700">Login</h1>
+      <form th:action="@{/login}" method="post" class="space-y-4">
+        <div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            required
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition transform hover:scale-105"
+        >
+          Login
+        </button>
+      </form>
+      <div th:if="${param.error}" class="text-red-600 text-center mt-4">
+        Invalid email or password. Please try again.
+      </div>
+      <div th:if="${param.logout}" class="text-green-600 text-center mt-4">
+        You have been logged out successfully.
+      </div>
+
+      <p class="mt-4 text-center text-gray-500">
+        Don't have an account?
+        <a th:href="@{/}" class="text-blue-600 hover:underline"
+          >Register here</a
+        >
+      </p>
+    </div>
+  </body>
+</html>

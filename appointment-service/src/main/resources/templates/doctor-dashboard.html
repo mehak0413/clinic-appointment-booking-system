@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/head :: commonHead('Doctor Dashboard')}"></head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-md w-full z-10 relative">
+      <div th:replace="~{fragments/header :: header('Doctor Dashboard')}"></div>
+    </header>
+
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside
+        class="w-64 bg-white shadow-lg fixed left-0 top-0 h-full pt-20 z-0"
+      >
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="flex-1 ml-64 p-8">
+        <h1 class="text-3xl font-bold mb-6 text-gray-700">Doctor Dashboard</h1>
+
+        <!-- Cards using fragment -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div
+            th:replace="~{fragments/cards :: card('Upcoming Appointments', ${upcomingAppointments})}"
+          ></div>
+          <div
+            th:replace="~{fragments/cards :: card('Total Patients', ${totalPatients})}"
+          ></div>
+
+          <!-- Available slots card with dropdown -->
+          <div class="bg-white rounded-2xl shadow-md p-6 w-64">
+            <h3 class="text-gray-500 font-semibold">Available Slots Today</h3>
+            <select
+              class="mt-2 w-full border border-gray-300 rounded-md p-2 text-gray-700"
+            >
+              <option
+                th:each="slot : ${availableSlots}"
+                th:text="${#temporals.format(slot, 'HH:mm')}"
+              >
+                09:00
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Upcoming appointments table -->
+        <div class="bg-white shadow rounded-xl p-6 mb-8">
+          <h2 class="text-xl font-semibold mb-4">Upcoming Appointments</h2>
+          <table class="w-full table-auto border-collapse">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="px-4 py-2 text-left">Patient</th>
+                <th class="px-4 py-2 text-left">Date & Time</th>
+                <th class="px-4 py-2 text-left">Status</th>
+                <th class="px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="appt : ${appointments}" class="border-b">
+                <td class="px-4 py-2" th:text="${appt.patientName}">
+                  Patient Name
+                </td>
+                <td
+                  class="px-4 py-2"
+                  th:text="${#temporals.format(appt.appointmentTime, 'dd MMM yyyy HH:mm')}"
+                >
+                  Date
+                </td>
+                <td class="px-4 py-2" th:text="${appt.status}">Status</td>
+                <td class="px-4 py-2">
+                  <a
+                    th:href="@{/appointments/update/{id}(id=${appt.id})}"
+                    class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition"
+                  >
+                    Update
+                  </a>
+
+                  <!-- Write Prescription button, only if not cancelled -->
+                  <a
+                    th:if="${appt.status != 'CANCELLED'}"
+                    th:href="@{/doctor/prescriptions/write/{appointmentId}(appointmentId=${appt.id})}"
+                    class="bg-green-500 text-white px-4 py-1 ml-2 rounded hover:bg-green-600 transition"
+                  >
+                    Write Prescription
+                  </a>
+                </td>
+              </tr>
+              <tr th:if="${appointments.size()} == 0">
+                <td colspan="4" class="text-center py-4 text-gray-500">
+                  No upcoming appointments found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Weekly appointments chart -->
+        <div class="bg-white shadow rounded-xl p-6">
+          <h2 class="text-xl font-semibold mb-4">Weekly Appointments</h2>
+          <canvas id="doctorChart"></canvas>
+        </div>
+      </main>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const labels = [[${chartLabels}]];
+      const data = {
+          labels: labels,
+          datasets: [{
+              label: 'Appointments',
+              backgroundColor: 'rgba(16, 185, 129, 0.5)',
+              borderColor: 'rgba(16, 185, 129, 1)',
+              borderWidth: 1,
+              data: [[${chartData}]],
+          }]
+      };
+
+      const config = {
+          type: 'bar',
+          data: data,
+          options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true, precision: 0 } }
+          }
+      };
+
+      new Chart(document.getElementById('doctorChart'), config);
+      /*]]>*/
+    </script>
+  </body>
+</html>

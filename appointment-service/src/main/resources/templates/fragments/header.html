@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+  <!-- Define the fragment with parameter -->
+  <header th:fragment="header(pageTitle)" class="flex justify-between items-center p-4 bg-white shadow-md w-full">
+    <h1 class="text-2xl font-bold text-blue-700" th:text="${pageTitle}">Dashboard</h1>
+    <div>
+        <span th:text="${#authentication.principal.username}">User Email</span>
+        <form th:action="@{/logout}" method="post" style="display:inline">
+    <button type="submit" class="ml-4 px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition">
+        Logout
+    </button>
+</form>
+
+    </div>
+</header>
+</body>
+</html>

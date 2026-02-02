@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: commonHead('Write Prescription')}"></head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-white shadow-md w-full z-10 relative">
+    <div th:replace="~{fragments/header :: header('Write Prescription')}"></div>
+  </header>
+
+  <main class="p-8 max-w-2xl mx-auto bg-white shadow rounded-xl mt-8">
+    <h1 class="text-2xl font-bold mb-4 text-gray-700">Write Prescription</h1>
+
+    <form th:action="@{/doctor/prescriptions/write}" th:object="${prescription}" method="post" class="space-y-4">
+      <input type="hidden" th:field="*{appointmentId}" />
+
+      <div>
+        <label class="block font-medium text-gray-600">Medication</label>
+        <input type="text" th:field="*{medication}" class="w-full border p-2 rounded" required />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-600">Dosage</label>
+        <input type="text" th:field="*{dosage}" class="w-full border p-2 rounded" required />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-600">Instructions</label>
+        <textarea th:field="*{instructions}" class="w-full border p-2 rounded" required></textarea>
+      </div>
+
+      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        Save Prescription
+      </button>
+    </form>
+  </main>
+</body>
+</html>

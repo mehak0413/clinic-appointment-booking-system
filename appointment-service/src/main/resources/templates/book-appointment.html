@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: commonHead('Book Appointment')}"></head>
+<body class="p-6 bg-gray-100">
+    
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md mt-6">
+        <h1 class="text-2xl font-bold mb-4">Book Appointment</h1>
+        
+        <form th:action="@{/appointments/book}" th:object="${appointment}" method="post" class="space-y-4">
+            
+            <!-- Doctor Dropdown -->
+            <div>
+                <label class="block font-semibold">Doctor:</label>
+                <select th:field="*{doctorId}" class="w-full border px-3 py-2 rounded-lg" required>
+                    <option value="">-- Select Doctor --</option>
+                    <option th:each="doc : ${doctors}" 
+                            th:value="${doc.id}" 
+                            th:text="${doc.name}"></option>
+                </select>
+            </div>
+
+            <!-- Patient (hidden, logged-in only) -->
+            <input type="hidden" th:field="*{patientId}" th:value="${patient.id}" />
+            <p class="text-gray-600">Booking for: <span th:text="${patient.name}">Patient Name</span></p>
+
+            <!-- Appointment Time -->
+            <div>
+                <label class="block font-semibold">Appointment Time:</label>
+                <input type="datetime-local" th:field="*{appointmentTime}" class="w-full border px-3 py-2 rounded-lg" required>
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition">
+                Book
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

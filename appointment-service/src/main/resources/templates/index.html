@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: commonHead('Clinic Appointment Booking System')}"></head>
+<body class="bg-gradient-to-r from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white p-12 rounded-2xl shadow-2xl text-center w-96">
+        <h1 class="text-4xl font-extrabold mb-8 text-gradient bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+            Clinic Appointment Service
+        </h1>
+        <div class="space-y-4">
+            <a th:href="@{/login}" 
+               class="block bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition transform hover:scale-105">
+                Login
+            </a>
+            <a th:href="@{/register/patient}" 
+               class="block bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition transform hover:scale-105">
+                Register as Patient
+            </a>
+            <a th:href="@{/register/doctor}" 
+               class="block bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-semibold transition transform hover:scale-105">
+                Register as Doctor
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
